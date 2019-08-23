@@ -62,9 +62,9 @@ $Letter = Get-UserChoice -Data A,B,C,D -Description "Pick your favorite letter!"
 
 Which would output the following prompt to the user:
 
-<p align="center"">
+{:refdef: style="text-align: center;"}
 ![_config.yml]({{ site.baseurl }}/images/blogimages/Get-UserChoice_EX1.png)
-</p>
+{: refdef}
 
 Now we have a $Letter variable that contains the user's selection, which we can use further down the line. One way I've been leveraging this functionality is by pairing it with switch{} statements. Building on our earlier example:
 
