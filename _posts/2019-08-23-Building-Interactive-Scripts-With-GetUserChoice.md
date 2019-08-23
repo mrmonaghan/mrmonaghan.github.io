@@ -93,7 +93,7 @@ Though simplistic, the above snippet demonstrates how you can build some interac
 
 "But this is Powershell!" you cry, "What of the objects?"
 
-Fret not, anonymous friend; in addition to the manually defined input in the previous examples, Get-UserChoice also accepts objects and (probably more importantly) objects from the pipeline. This allows us to leverage the command when we're generating a list of options dynamically:
+Fret not, anonymous friend; in addition to the manually defined input in the previous examples, Get-UserChoice also accepts objects and (probably more importantly) objects from the pipeline. This allows us to leverage the command when we're generating a list of options dynamically and send the results down the pipeline:
 
 ![_config.yml]({{ site.baseurl }}/images/blogimages/Get-UserChoice_EX2.png)
   
