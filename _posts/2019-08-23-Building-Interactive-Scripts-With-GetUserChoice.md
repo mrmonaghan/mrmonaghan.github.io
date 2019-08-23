@@ -5,7 +5,7 @@ title: Building Interactive Scripts With Get-UserChoice
 
 Occasionally I make tools for other people, which is simultaneously exciting and frustrating. On one hand, I'm able to streamline processes for my colleagues and clients; on the other, I actually have to make the damn things digestable for someone other than myself.
 
-To that end, I've developed the Get-UserChoice function that leverages the '[System.Management.Automation]' class to allow a user to select from a list of options you present them.
+To that end, I've developed the Get-UserChoice function, which leverages the '[System.Management.Automation]' class to allow a user to select from a list of options you present them.
 
 
 {% highlight powershell %}
@@ -126,4 +126,4 @@ And the output that is displayed to the user:
 
 ![_config.yml]({{ site.baseurl }}/images/blogimages/Get-UserChoice_EX3.png)
 
-As you can see, this is a very robust function. I'm only really beginning to scratch the surface of potential use cases as I dive deeper into Powershell tool-making. Hopefully you can make use of it as well!
+As you can see, this is a very robust function. I'm only really beginning to scratch the surface of potential use cases as I dive deeper into Powershell tool-making. The function is available from its [dedicated repository here.](https://github.com/mrmonaghan/Get-UserChoice) Hopefully you can make use of it as well!
