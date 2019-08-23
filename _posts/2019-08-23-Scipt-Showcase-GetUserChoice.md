@@ -1,11 +1,14 @@
 ---
 layout: post
 title: Script Showcase: Get-UserChoice
+excerpt_separator: <!--more-->
 ---
 
 Occasionally I make tools for other people, which is simultaneously exciting and frustrating. On one hand, I'm able to streamline processes for my colleagues and clients; on the other, I actually have to make the damn things digestable for someone other than myself.
 
 To that end, I've developed the Get-UserChoice function that leverages the '[System.Management.Automation]' class to allow a user to select from a list of options you present them.
+
+<!--more-->
 
 {% highlight powershell %}
 {% raw %}
