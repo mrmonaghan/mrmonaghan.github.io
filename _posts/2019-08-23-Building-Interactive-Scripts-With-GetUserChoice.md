@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Get-UserChoice
+title: Building Interactive Scripts With Get-UserChoice
 ---
 
 Occasionally I make tools for other people, which is simultaneously exciting and frustrating. On one hand, I'm able to streamline processes for my colleagues and clients; on the other, I actually have to make the damn things digestable for someone other than myself.
@@ -62,7 +62,9 @@ $Letter = Get-UserChoice -Data A,B,C,D -Description "Pick your favorite letter!"
 
 Which would output the following prompt to the user:
 
+<p align="center"">
 ![_config.yml]({{ site.baseurl }}/images/blogimages/Get-UserChoice_EX1.png)
+</p>
 
 Now we have a $Letter variable that contains the user's selection, which we can use further down the line. One way I've been leveraging this functionality is by pairing it with switch{} statements. Building on our earlier example:
 
