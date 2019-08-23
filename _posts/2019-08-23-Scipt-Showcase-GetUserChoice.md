@@ -60,7 +60,7 @@ $Letter = Get-UserChoice -Data A,B,C,D -Description "Pick your favorite letter!"
 {% endhighlight %}
 
 Which would output the following prompt to the user:
-![_config.yml]({{ site.baseurl }}/images/blog/Get-UserChoice_EX1.png)
+![_config.yml]({{ site.baseurl }}/images/blogimages/Get-UserChoice_EX1.png)
 
 Now we have a $Letter variable that contains the user's selection, which we can use further down the line. One way I've been leveraging this functionality is by pairing it with switch{} statements. Building on our earlier example:
 
@@ -91,7 +91,7 @@ Though simplistic, the above snippet demonstrates how you can build some interac
 
 Fret not, anonymous friend; in addition to the manually defined input in the previous examples, Get-UserChoice also accepts objects and (probably more importantly) objects from the pipeline. This allows us to leverage the command when we're generating a list of options dynamically:
 
-![_config.yml]({{ site.baseurl }}/images/blog/Get-UserChoice_EX2.png)
+![_config.yml]({{ site.baseurl }}/images/blogimages/Get-UserChoice_EX2.png)
   
 In this way, the function can be worked into much more complex scripts. I've created a short trivia game that utilizes Get-UserChoice to allow the user to answer multiple choice questions I've defined in $Data, and a simple if(..) statment to determine whether the user's selection was right or wrong based on my pre-defined Correct property.
 
@@ -120,6 +120,6 @@ Write-Host "You earned $Points points out of a possible total of $TotalPossible!
 
 And the output that is displayed to the user:
 
-![_config.yml]({{ site.baseurl }}/images/blog/Get-UserChoice_EX3.png)
+![_config.yml]({{ site.baseurl }}/images/blogimages/Get-UserChoice_EX3.png)
 
 As you can see, this is a very robust function. I'm only really beginning to scratch the surface of potential use cases as I dive deeper into Powershell tool-making. Hopefully you can make use of it as well!
