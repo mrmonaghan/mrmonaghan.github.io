@@ -63,6 +63,7 @@ $Letter = Get-UserChoice -Data A,B,C,D -Description "Pick your favorite letter!"
 {% endhighlight %}
 
 Which would output the following prompt to the user:
+
 ![_config.yml]({{ site.baseurl }}/images/blogimages/Get-UserChoice_EX1.png)
 
 Now we have a $Letter variable that contains the user's selection, which we can use further down the line. One way I've been leveraging this functionality is by pairing it with switch{} statements. Building on our earlier example:
