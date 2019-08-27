@@ -7,49 +7,9 @@ Occasionally I make tools for other people, which is simultaneously exciting and
 
 To that end, I've developed the Get-UserChoice function, which leverages the '[System.Management.Automation]' class to allow a user to select from a list of options you present them.
 
-
+{% github_sample_ref mrmonaghan/Get-UserChoice/blob/master/Get-UserChoice.ps1 %}
 {% highlight powershell %}
-{% raw %}
-function Get-UserChoice {
-[CmdletBinding()]
-
-param(
-    [Parameter(
-        Mandatory = $True,
-        ValueFromPipeline = $true,
-        ValueFromPipelineByPropertyName = $True)]
-    [Alias('Name','Input')]
-    [Object]$Data,
-
-    [Parameter()]
-    [string]$Title,
-
-    [Parameter()]
-    [string]$Description
-    )
-
-    Begin {
-        $DefaultChoiceIndex = -1
-        $Options = @()
-        $i = 0
-        }
-    Process {
-        foreach ($value in $Data) {
-            $i++
-            $NewChoice = [System.Management.Automation.Host.ChoiceDescription]::new("&$value")
-            $NewChoice | Add-Member -MemberType NoteProperty -Name Name -Value $value
-            $Options += $NewChoice
-            }
-        }
-
-
-    end {
-        $ChosenIndex = $host.UI.PromptForChoice($Title,$Description,$Options,$DefaultChoiceIndex)
-        $Chosen = $Options[$ChosenIndex].name
-        Write-Output $Chosen
-        }
-}
-{% endraw %}
+{% github_sample mrmonaghan/Get-UserChoice/blob/master/Get-UserChoice.ps1 0 %}
 {% endhighlight %}
 
 You can leverage this in a number of ways. The simplest is to create a variable that a user can define from a list of values you preselect, like so:
