@@ -14,7 +14,7 @@ Recently I was tasked with identifying a backup solution with the following crit
   6. Cost no money
 
 Some of these restrictions were imposed by the client, some by their LOB software vendor, and some by the environment itself; what resulted was a the business-case version of a table flip - a very polite and professional "Screw it, I'll just build the damn thing myself."
-<!-- more -->
+
 Let's start by breaking down and solving the relevant requirements listed above.
 
 #1. Perform regular, full image backups of a machine
@@ -26,8 +26,8 @@ The answer resides in Powershells Start-Process and Wait-Process cmdlets, which 
 
 {% highlight powershell %}
 {% raw %}
-    $Process = Start-Process -File "wbadmin" -ArgumentList 'start backup -backupTarget:E: -include:C: -quiet -allCritical' -PassThru
-    Wait-Process -InputObject $Process
+$Process = Start-Process -File "wbadmin" -ArgumentList 'start backup -backupTarget:E: -include:C: -quiet -allCritical' -PassThru
+Wait-Process -InputObject $Process
 {% endraw %}
 {% endhighlight %}
 
@@ -40,8 +40,8 @@ Next, we need to address points 2 and 3 together. Traditionally (and in an ideal
 
 {% highlight powershell %}
 {% raw %}
-    $VolumeID = '<Insert Volume GUID string>'
-    mountvol E: $VolumeID
+$VolumeID = '<Insert Volume GUID string>'
+mountvol E: $VolumeID
 {% endraw %}
 {% endhighlight %}
 
@@ -49,7 +49,7 @@ Again, the syntax here is pretty simple. First, we need to define the $VolumeID 
 
 {% highlight powershell %}
 {% raw %}
-    Get-WmiObject -Class Win32_Volume | Where-Object {$_.label -like "<ENTER BACKUP DRIVE NAME OR PARTIAL NAME HERE>"} | Select-Object -ExpandProperty DeviceID
+Get-WmiObject -Class Win32_Volume | Where-Object {$_.label -like "<ENTER BACKUP DRIVE NAME OR PARTIAL NAME HERE>"} | Select-Object -ExpandProperty DeviceID
 {% endraw %}
 {% endhighlight %}
 
@@ -59,9 +59,9 @@ Likewise, we can use mountvol to unmount the drive once our backup completes.
 
 {% highlight powershell %}
 {% raw %}
-    $EjectDrive = Get-WmiObject -Class Win32_Volume | Where-Object {$_.label -like "<ENTER BACKUP DRIVE NAME OR PARTIAL NAME HERE>"}
-    $EjectDriveLetter = $EjectDrive.DriveLetter
-    mountvol $EjectDriveLetter /p
+$EjectDrive = Get-WmiObject -Class Win32_Volume | Where-Object {$_.label -like "<ENTER BACKUP DRIVE NAME OR PARTIAL NAME HERE>"}
+$EjectDriveLetter = $EjectDrive.DriveLetter
+mountvol $EjectDriveLetter /p
 {% endraw %}
 {% endhighlight %}
 
@@ -83,28 +83,28 @@ We'll start with the New-LogObject function at the top of the script:
 
 {% highlight powershell %}
 {% raw %}
-   Function New-LogObject {
-    [CmdletBinding()]
+Function New-LogObject {
+[CmdletBinding()]
 
-    Param(
-        [Parameter(Mandatory)]
-        [object]$Text,
+  Param(
+    [Parameter(Mandatory)]
+    [object]$Text,
 
-        [Parameter(Mandatory)]
-        [object]$Status
-    )
+    [Parameter(Mandatory)]
+    [object]$Status
+  )
 
-    begin {}
-    process {
-            $LogObject = [PSCustomObject]@{
-                Text = $Text
-                Status = $Status
-                Timestamp = Get-Date
-            }
-        }
-    end {
-            Write-Output $LogObject
-    }
+  begin {}
+  process {
+    $LogObject = [PSCustomObject]@{
+      Text = $Text
+      Status = $Status
+      Timestamp = Get-Date
+      }
+   }
+  end {
+    Write-Output $LogObject
+}
 {% endraw %}
 {% endhighlight %}
 
@@ -114,7 +114,7 @@ Next, we need a place to put all of the log objects that we create, so let's cre
 
 {% highlight powershell %}
 {% raw %}
-    $LogResults = New-Object System.Collections.Generic.List[System.Object]
+$LogResults = New-Object System.Collections.Generic.List[System.Object]
 {% endraw %}
 {% endhighlight %}
 
@@ -124,10 +124,10 @@ Let's see what this looks like in the context of our script:
 
 {% highlight powershell %}
 {% raw %}
-    $Step = "Mount Volume"
-    $VolumeID = '<Insert Volume GUID string>'
-    mountvol E: $VolumeID
-    $LogResults.Add((New-LogObject -Text $Step -Status "Complete"))
+$Step = "Mount Volume"
+$VolumeID = '<Insert Volume GUID string>'
+mountvol E: $VolumeID
+$LogResults.Add((New-LogObject -Text $Step -Status "Complete"))
 {% endraw %}
 {% endhighlight %}
 
@@ -137,17 +137,17 @@ And what if those steps aren't completing? The code above would still create a l
 
 {% highlight powershell %}
 {% raw %}
-  try {
-    #Mount the volume and log the results to $LogResults
-    $Step = "Mount Volume"
-    $VolumeID = '<Insert Volume GUID string>'
-    mountvol E: $VolumeID
-    $LogResults.Add((New-LogObject -Text $Step -Status "Complete"))
+try {
+  #Mount the volume and log the results to $LogResults
+  $Step = "Mount Volume"
+  $VolumeID = '<Insert Volume GUID string>'
+  mountvol E: $VolumeID
+  $LogResults.Add((New-LogObject -Text $Step -Status "Complete"))
   #REST OF CODE  
-    }
+  }
 catch {
-    Write-Verbose "Error encountered. Error code: $Error"
-    $LogResults.Add((New-LogObject -Text $Step -Status $Error))
+  Write-Verbose "Error encountered. Error code: $Error"
+  $LogResults.Add((New-LogObject -Text $Step -Status $Error))
 }
 $LogResults | Out-File C:\Temp\Results.log
 {% endraw %}
@@ -163,23 +163,23 @@ This script uses my [Send-SESEmail](https://github.com/mrmonaghan/posh/blob/mast
 
 {% highlight powershell %}
 {% raw %}
-    try {
-      #The whole script
-      $ScriptComplete = $true
-      }
-    catch {
-      Write-Verbose "Error encountered. Error code: $Error"
-      $LogResults.Add((New-LogObject -Text $Step -Status $Error))
-      }
+try {
+  #The whole script
+  $ScriptComplete = $true
+  }
+catch {
+  Write-Verbose "Error encountered. Error code: $Error"
+  $LogResults.Add((New-LogObject -Text $Step -Status $Error))
+}
 
-    $LogResults | Out-File C:\Temp\Results.log
-    $LogString = $LogResults | Out-String
-    if ($ScriptComplete) {
-        Send-SESEmail -To youremail@domain.com -Subject "Backup Complete" -Body $LogString -Attachment C:\Temp\Results.log
-        }
-    else {
-        Send-SESEmail -To youremail@domain.com-Subject "Backup Error on $env:Computername" -Body $LogString -Attachment       C:\Temp\Results.log
-        }
+$LogResults | Out-File C:\Temp\Results.log
+$LogString = $LogResults | Out-String
+if ($ScriptComplete) {
+  Send-SESEmail -To youremail@domain.com -Subject "Backup Complete" -Body $LogString -Attachment C:\Temp\Results.log
+  }
+else {
+  Send-SESEmail -To youremail@domain.com-Subject "Backup Error on $env:Computername" -Body $LogString -Attachment      C:\Temp\Results.log
+}
 {% endraw %}
 {% endhighlight %}
 
