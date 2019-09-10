@@ -22,7 +22,7 @@ Our first task is to determine what native Windows 10 backup functionality best 
 
 The WBAdmin command line utility and [its accompanying documentation](https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/wbadmin) provide all the information we need to start and monitor a backup job from CMD - but how can we leverage Powershell to integrate that into our solution more elegantly?
 
-The answer resides in Powershells Start-Process and Wait-Process cmdlets, which allow us to launch WBAdmin, assign the process a variable, and wait for the process to exit before continuing.
+The answer resides in Powershell's Start-Process and Wait-Process cmdlets, which allow us to launch WBAdmin, assign the process a variable, and wait for the process to exit before continuing.
 
 {% highlight powershell %}
 {% raw %}
@@ -31,7 +31,7 @@ Wait-Process -InputObject $Process
 {% endraw %}
 {% endhighlight %}
 
-This ends up being fairly straightforward and readable. We use Start-Process to start the wbadmin application using the -File parameter and supply ALL of the remaining arguments via the -ArgumentList parameter. These all get compiled into a long string, as that is the only way WBAdmin accepts the input. Finally, we include the -Passthru parameter which returns a process object (similar to what would be returned by Get-Process) for each process the Start-Process cmdlet starts. This process object gets assigned to the $Process variable, which we call in the next line.
+This ends up being fairly straightforward and readable. We use Start-Process to start the wbadmin application by supplying the name of the application to the -File parameter, and supply ALL of the remaining arguments via the -ArgumentList parameter. These all get compiled into a long string, as that is the only way WBAdmin accepts the input. Finally, we include the -Passthru parameter which returns a process object (similar to what would be returned by Get-Process) for each process the Start-Process cmdlet starts. This process object gets assigned to the $Process variable, which we call in the next line.
 
 Now that we've started the process, we need to use Wait-Process to tell the script not to do anything else until the WBAdmin process has completed and exited. Wait-Process accepts a couple of different types of input, but since $Process contains a process object thanks to the -Passthru parameter, we'll supply $Process to Wait-Process via the -InputObject parameter. Now our script will monitor the status of the WBAdmin process, proceeding to the next step only when the process exits.
 
@@ -53,7 +53,11 @@ Get-WmiObject -Class Win32_Volume | Where-Object {$_.label -like "<ENTER BACKUP 
 {% endraw %}
 {% endhighlight %}
 
-Which will return a string that looks like this \\?\Volume{0000e0e0-0000-0000-0000-000000000000}\ which will become your $VolumeID. Once $VolumeID is defined, we feet the variable into the mountvol utility along with the drive letter we would like the drive to be mounted with.
+Which will return a string that looks like this: 
+
+\\?\Volume{0000e0e0-0000-0000-0000-000000000000}\ 
+
+which will become your $VolumeID. Once $VolumeID is defined, we feed the variable into the mountvol utility along with the drive letter we would like the drive to be mounted with.
 
 Likewise, we can use mountvol to unmount the drive once our backup completes.
 
@@ -65,7 +69,7 @@ mountvol $EjectDriveLetter /p
 {% endraw %}
 {% endhighlight %}
 
-Our first line defines the drive to eject based on the drive's Label property - in my case, all of the local USB drives contained the word "backup" in their label, so I filtered based on that. You could easily reuse the $VolumeID variable and find your drive based on it's DeviceID as well. Our second line defines selects the DriveLetter property of our $Drive and assigns it to the $DriveLetter variable, which we then supply to mountvol alongside the /p flag to eject the drive.
+Our first line defines the drive to eject based on the drive's Label property - in my case, all of the local USB drives contained the word "backup" in their label, so I filtered based on that. You could easily reuse the $VolumeID variable and find your drive based on it's DeviceID as well. Our second line selects the DriveLetter property of our $Drive and assigns it to the $DriveLetter variable, which we then supply to mountvol alongside the /p flag to dismount the drive.
 
 So now our script can: 
   * Mount a drive
@@ -76,7 +80,7 @@ So now our script can:
 This statisfies requirements 1, 2, and 3. We've also designed the solution using native Windows 10 functionality, so we know we've covered 4 and 5 as well. Additionally, since all we've invested is our time (which we all know has no value at all), we can check requirement 6 off our list as well. Excellent! We've met all of the requirements set out for us. That means we're done, right?
 
 ### Logging and Error Handling
-Well, sort've. We also need to make sure it works, and that we can fix it when it doesn't. It's frustrating when you come across a solution like this is undocumented and a bit arcane -  it's infuriating when you built it.
+Well, sort've. We also need to make sure it works, and that we can fix it when it doesn't. It's frustrating when you come across a solution like this that is undocumented and a bit arcane -  it's *infuriating* when you built it.
 
 With that in mind, we're going to add some logging, error handling, and notification functionality to our script.
 
@@ -119,7 +123,7 @@ $LogResults = New-Object System.Collections.Generic.List[System.Object]
 {% endraw %}
 {% endhighlight %}
 
-Generic Lists function more or less like arrays, but have a couple of key differences, on of which we're going to leverage here to improve performance - the .Add() method. .Add() allows us to quickly add new objects to the existing list as we create them without waiting for $LogResults to rebuild like we would if we were using an array with the += operator.
+Generic Lists function more or less like arrays, but have a couple of key differences, one of which we're going to leverage here to improve performance - the .Add() method. .Add() allows us to quickly add new objects to the existing list as we create them without waiting for $LogResults to rebuild like we would if we were using an array with the += operator.
 
 Let's see what this looks like in the context of our script:
 
@@ -154,7 +158,7 @@ $LogResults | Out-File C:\Temp\Results.log
 {% endraw %}
 {% endhighlight %}
 
-I've omitted most of the script, because I want to focus on the try..catch blocks specifically. Per the documentation linked above, if any point our code inside the try{} block encounters a terminating error, the script will immediately stop it and execute the catch{} block, which contains the automatic variable $Error, which in turn contains the details of our terminating error.
+I've omitted most of the script, because I want to focus on the try..catch blocks specifically. Per the documentation linked above, if at any point our code inside the try{} block encounters a terminating error, the script will immediately stop it and execute the catch{} block, which contains the automatic variable $Error, which in turn contains the details of our terminating error.
 
 What this means for us is that, if and when our script encounters an error, the catch{} block will grab it and log it into $LogResults alongside current $Step where we encountered the error. $LogResults then immediately gets exported to a file for us to review at our leisure.
 
@@ -186,4 +190,4 @@ else {
 
 We start by setting the $ScriptComplete variable at the end of our try{} block, ensuring it doesn't exist until the block has compeleted. Once the block has exited, the script checks for the existance of $ScriptComplete. If it's been defined, it sends the "Backup Complete" email with Results.log attached. If $ScriptComplete is not defined, it indicates that an error was encountered, and the script will send the "Backup Error" email with Results.log attached. Thanks to our catch{} block, this contains the error code that caused the try{} block to terminate, allowing us to start troubleshooting.
 
-I would like to finish this post by saying that in no way to I beleive this to be an ideal backup solution, but if you're in a pinch, it's better than absolutely nothing.
+I would like to finish this post by saying that in no way to I believe this to be an ideal backup solution, but if you're in a pinch, it's better than absolutely nothing.
