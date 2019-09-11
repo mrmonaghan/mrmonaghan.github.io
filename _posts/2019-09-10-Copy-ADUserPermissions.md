@@ -36,7 +36,6 @@ Now, let's functionalize it.
 There is a lot of literature on the structure of functions and advanced functions (I particularly like [this writeup](https://adamtheautomator.com/powershell-functions/) by Adam Bertram, as it breaks down the structure syntax quite nicely), so I will not dive too deeply into the basics of function structure. Suffice to say, our short script now looks much more intimidating.
 
 {% highlight powershell %}
-{% raw %}
 Function Copy-ADUserPermissions {
     [CmdletBinding()]
 
@@ -62,8 +61,6 @@ Function Copy-ADUserPermissions {
     end {
         Write-Output "Complete!"
     }
-}
-{% endraw %}
 {% endhighlight %}
 
 
