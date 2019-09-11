@@ -1,11 +1,13 @@
 ---
 layout: post
 title: Copy-ADUserPermissions Build Walkthrough
+excerpt_separator: <!--more-->
 ---
 
 Recently I completed a function for a team member who found themselves frequently encountering situations in which they needed to copy AD group membership from one user to another, but were unable to use Active Directory's copy functionality for reasons.
 
 Not only would I like to share this function (as I'm sure my colleague is not the only one suffering the pain of manually adding dozens of group memberships), but I'd also like to break down the process of building and refining it. It is my hope that documenting this process will assist other scripters on their pilgrimage towards writing advanced functions.
+<!--more-->
 
 ### Step 0: Roadmapping and Building the Framework
 First, we need to determine what our function needs to do. I like to map this out visually on a whiteboard, but it's just as easy to put it down in a list format. Minimally, our function will need to:
