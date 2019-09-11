@@ -286,9 +286,11 @@ This is where most of the changes have occured since our last iteration. Our new
 That's a lot to process. Thankfully, it's much clearer when we see it in action.
   
 Here we can see the results of two successful membership copies:
+
 ![_config.yml]({{ site.baseurl }}/images/blogimages/Copy-ADUserPermissions_EX1.png)
   
 And here we can see the results of the function when a target user's group membership is not the same as the $SourceGroup array:
+
 ![_config.yml]({{ site.baseurl }}/images/blogimages/Copy-ADUserPermissions_EX2.png)
 
 We can see that the DiffGroup in question is Group5, and that RWeasley is a member of it. This makes sense, as we did not run the function with the -OverwriteExisting paramter, so the $SourceGroup membership would have been applied on top of whatever groups RWeasley was already in.
