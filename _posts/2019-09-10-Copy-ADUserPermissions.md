@@ -291,4 +291,7 @@ This is where most of the changes have occured since our last iteration. Our new
   
   ![_config.yml]({{ site.baseurl }}/images/blogimages/Copy-ADUserPermissions_EX2.png)
     
-  And here we can see the results of the function when a target user's group membership is not the same as the $SourceGroup array. We can see that the DiffGroup in question is Group5, and that RWeasley is a member of it. This makes sense, as we did not run the function with the -OverwriteExisting paramter, so the $SourceGroup membership would have been applied on top of whatever groups RWeasley was already in.   
+  And here we can see the results of the function when a target user's group membership is not the same as the $SourceGroup array. We can see that the DiffGroup in question is Group5, and that RWeasley is a member of it. This makes sense, as we did not run the function with the -OverwriteExisting paramter, so the $SourceGroup membership would have been applied on top of whatever groups RWeasley was already in.
+
+### Conclusion
+The full function is available for review and download [at its dedicated repository, here.](https://github.com/mrmonaghan/Copy-ADUserPermissions) It's my hope that, through this description of process or the function itself, I'm able to provide a solution to a problem someone is furiously googling.
