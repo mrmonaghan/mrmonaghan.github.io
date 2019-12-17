@@ -1,8 +1,12 @@
+layout: post
+title: Monitoring Windows Server Backups
+---
+
 Windows Server Backup is a lot like my first car - it does almost nothing that I wish it did, but it gets you where you need to go. Thankfully, we can tune it up a bit with some aftermarket Powershell to make WSB a more respectable disaster recovery whip.
 
 One thing that I like to know about my backups is when they are or are not working. Unforunately, WSB requires us to manually review it's logs to determine if backups are completing successfully. As part of my ongoing initiative to do as little as possible on a regular basis, I've developed a quick script to keep me in the loop.
 
-The first thing we need to do is identify whyat happens when a WSB backup job fails - if we take a look at the Event Logs under Microsoft-Windows-Backups, we can see that the Operational log contains all of the information we need to power our notifications. There are lots of ways to review these logs from the command line like [Get-WinEvent](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.diagnostics/get-winevent?view=powershell-6) and [Get-EventLog](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-eventlog?view=powershell-5.1). I was recently recommended a method of filtering Get-WinEvent by [u/OlivTheFrog](https://www.reddit.com/user/OlivTheFrog) over on the Powershell subreddit that I have been having a lot of success with, and that I will employ here. It utilizes the -FilterHashtable parameter to drastically increase the speed at which your script queries events in additon to providing a more readable filter as you can see below:
+The first thing we need to do is identify what happens when a WSB backup job fails - if we take a look at the Event Logs under Microsoft-Windows-Backups, we can see that the Operational log contains all of the information we need to power our notifications. There are lots of ways to review these logs from the command line like [Get-WinEvent](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.diagnostics/get-winevent?view=powershell-6) and [Get-EventLog](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-eventlog?view=powershell-5.1). I was recently recommended a method of filtering Get-WinEvent by [u/OlivTheFrog](https://www.reddit.com/user/OlivTheFrog) over on the Powershell subreddit that I have been having a lot of success with, and that I will employ here. It utilizes the -FilterHashtable parameter to markedly increase the speed at which your script queries events in additon to providing a more readable filter as you can see below:
 
 {% highlight powershell %}
 {% raw %}
@@ -21,7 +25,7 @@ $Information = Get-WinEvent -FilterHashtable @{ProviderName=$ProviderName
 
 As you can see, the syntax is very simple. Rather than using Where-Object to filter an entire list of objects, -FilterHashtable allows us to skip the garbage and go directly to the objects that match our filter. I use the Level property to filter events based on their severity, and save them into seperate variables for later.
 
-Next we need to figure out what is relevant. Unlike other backup softwares, we can't clear the Error Event once we've resolved the issue (well, we can, but that kind've defeats the purpose of the Event Log). Instead, we can filter by the TimeCreated property to find out what is happening recently.
+Next we need to figure out what's relevant. Unlike other backup softwares, we can't clear the Error Event once we've resolved the issue (well, we can, but that kind've defeats the purpose of the Event Log). Instead, we can filter by the TimeCreated property to find out what is happening recently.
 
 {% highlight powershell %}
 {% raw %}
@@ -30,9 +34,9 @@ $RecentSuccess = $Information | Where-Object {$_.TimeCreated -ge (Get-Date).AddD
 {% endraw %}
 {% endhighlight %}
 
-Because we're comparing two [datetime] objects, we can't include this filtering in the -FilterHashtable parameter of our initial query. The above code will build two lists, one of Information level events and one that contains Critical, Error, and Warning level events. Both $Recent lists will only contain events that occured within the last 24 hours. We'll be running this script as a scheduled task as opposed to triggering it on event occurange because we don't necessarily know what specific error will occur and presumably we want to be notified of any issue with our precious backups.
+Because we're comparing two [datetime] objects, we can't include this filtering in the -FilterHashtable parameter of our initial query. The above code will build two lists, one of Information level events and one that contains Critical, Error, and Warning level events. Both $Recent lists will only contain events that occured within the last 24 hours. We'll be running this script as a scheduled task as opposed to triggering it on event occurance because we don't necessarily know what specific error, will occur and presumably we want to be notified of any issue with our precious backups.
 
-Now that we have our errors, we can build our notification.
+Now that we have our errors nicely packed into an array, we can build our notification.
 
 Anyone that's tried to sent notifications with Powershell knows two things: 
   1. It's surprisingly easy
