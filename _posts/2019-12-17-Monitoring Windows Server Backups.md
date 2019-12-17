@@ -102,7 +102,7 @@ $HTMLBody += $RecentSuccess | Select-Object TimeCreated,Id,LevelDisplayName,Mess
 
 If we were to simply convert these variables into strings and put them in the body of our email, they wouldn't really further our respectable car fantasy - the headers would be all over the place, and long strings would be trunctated down to what you would see in the console. Instead, we convert the objects to HTML (making sure to select only the properties we want in our table, as ConvertTo-HTML will convert all of an object's properties if you let it) and *then* convert that HTML to a string to put into the body of our email. By specifying the -BodyAsHTML parameter on Send-MailMessage, we tell the cmdlet to interpret the HTML string as proper HTML and deliver the message with our sexy new formatting. Take a look:
 
-![_config.yml]({{ site.baseurl }}/images/blogimages/EmailHTML.png)
+![_config.yml]({{ site.baseurl }}/images/blogimages/EmailHTML.PNG)
 
 Now, back to the code. As you can see above, if we count the objects contained in $RecentErrors (which, remember, contains Critical, Error, and Warning level events) and it's got something in it, we know there is an issue with the backups. We can then proceed to customize both our $HTMLBody with a table header that indicates we have a problem, and our Send-MailMessage cmdlet with an appropriate subject line. If $RecentErrors does not contain any data, we simply move on and send an email celebrating our backup success that includes the Information level events that occurred within the last day.
 
