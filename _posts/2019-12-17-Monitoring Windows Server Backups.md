@@ -35,7 +35,11 @@ $RecentSuccess = $Information | Where-Object {$_.TimeCreated -ge (Get-Date).AddD
 {% endraw %}
 {% endhighlight %}
 
-Because we're comparing two [datetime] objects, we can't include this filtering in the -FilterHashtable parameter of our initial query. The above code will build two lists, one of Information level events and one that contains Critical, Error, and Warning level events. Both $Recent lists will only contain events that occured within the last 24 hours. We'll be running this script as a scheduled task as opposed to triggering it on event occurance because we don't necessarily know what specific error, will occur and presumably we want to be notified of any issue with our precious backups.
+We can't include our TimeCreated filtering in the hashtable for two reasons:
+  1. -FilterHashtable doesn't support the TimeCreated property, only StartTime and EndTime
+  2. Because we're comparing two [datetime] objects to determine if something happened within the last 24 hours, StartTime and EndTime won't do us much good. 
+  
+The above code will build two lists, one of Information level events and one that contains Critical, Error, and Warning level events. Both $Recent lists will only contain events that occured within the last 24 hours. We'll be running this script as a scheduled task as opposed to triggering it on event occurance because we don't necessarily know what specific error, will occur and presumably we want to be notified of any issue with our precious backups.
 
 Now that we have our errors nicely packed into an array, we can build our notification.
 
