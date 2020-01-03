@@ -7,7 +7,7 @@ Windows Server Backup is a lot like my first car - it does almost nothing that I
 
 One thing that I like to know about my backups is when they are or are not working. Unforunately, WSB requires us to manually review it's logs to determine if backups are completing successfully. As part of my ongoing initiative to do as little as possible on a regular basis, I've developed a quick script to keep me in the loop.
 
-The first thing we need to do is identify what happens when a WSB backup job fails - if we take a look at the Event Logs under Microsoft-Windows-Backups, we can see that the Operational log contains all of the information we need to power our notifications. There are lots of ways to review these logs from the command line like [Get-WinEvent](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.diagnostics/get-winevent?view=powershell-6) and [Get-EventLog](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-eventlog?view=powershell-5.1). I was recently recommended a method of filtering Get-WinEvent by [u/OlivTheFrog](https://www.reddit.com/user/OlivTheFrog) over on the Powershell subreddit that I have been having a lot of success with, and that I will employ here. It utilizes the -FilterHashtable parameter to markedly increase the speed at which your script queries events in additon to providing a more readable filter as you can see below:
+The first thing we need to do is identify what happens when a WSB backup job fails - if we take a look at the Event Logs under Microsoft-Windows-Backups, we can see that the Operational log contains all of the information we need to power our notifications. There are lots of ways to review these logs from the command line like [Get-WinEvent](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.diagnostics/get-winevent?view=powershell-6) and [Get-EventLog](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-eventlog?view=powershell-5.1). I was recently recommended a method of filtering Get-WinEvent by [u/OlivTheFrog](https://www.reddit.com/user/OlivTheFrog) over on the Powershell subreddit that I have been having a lot of success with, and that I will employ here. It utilizes the -FilterHashtable parameter to markedly increase the speed at which your script queries events in additon to providing a more readable filter, as you can see below:
 
 {% highlight powershell %}
 {% raw %}
@@ -26,7 +26,7 @@ $Information = Get-WinEvent -FilterHashtable @{ProviderName=$ProviderName
 
 As you can see, the syntax is very simple. Rather than using Where-Object to filter an entire list of objects, -FilterHashtable allows us to skip the garbage and go directly to the objects that match our filter. I use the Level property to filter events based on their severity, and save them into seperate variables for later.
 
-Next we need to figure out what's relevant. Unlike other backup softwares, we can't clear the Error Event once we've resolved the issue (well, we can, but that kind've defeats the purpose of the Event Log). Instead, we can filter by the TimeCreated property to find out what is happening recently.
+Next we need to figure out what's relevant. Unlike other backup softwares, we can't clear the Error Event once we've resolved the issue (well, we can, but that kind've defeats the purpose of the Event Log). Instead, we can filter by the TimeCreated property to find out what's happened recently.
 
 {% highlight powershell %}
 {% raw %}
@@ -44,8 +44,8 @@ The above code will build two lists, one of Information level events and one tha
 Now that we have our errors nicely packed into an array, we can build our notification.
 
 Anyone that's tried to sent notifications with Powershell knows two things: 
-  1. It's surprisingly easy
-  2. Formatting Powershell objects into a readable format is less easy
+  1. They are surprisingly easy to send
+  2. They are significantly harder to make pretty before sending
 
 To remedy this, we're going to have to slum it a little and build some HTML.
 
@@ -108,8 +108,8 @@ If we were to simply convert these variables into strings and put them in the bo
 
 ![_config.yml]({{ site.baseurl }}/images/blogimages/EmailHTML.PNG)
 
-Now, back to the code. As you can see above, if we count the objects contained in $RecentErrors (which, remember, contains Critical, Error, and Warning level events) and it's got something in it, we know there is an issue with the backups. We can then proceed to customize both our $HTMLBody with a table header that indicates we have a problem, and our Send-MailMessage cmdlet with an appropriate subject line. If $RecentErrors does not contain any data, we simply move on and send an email celebrating our backup success that includes the Information level events that occurred within the last day.
+Now, back to the code. As you can see above, if we count the objects contained in $RecentErrors (which, remember, contains Critical, Error, and Warning level events) and it's got something in it, we know there's an issue with the backups; we can then proceed to customize both our $HTMLBody with a table header that indicates we have a problem, and our Send-MailMessage cmdlet with an appropriate subject line. If $RecentErrors does not contain any data, we simply move on and send an email celebrating our backup success that includes our recent Information level events, such as confirmation of backup success.
 
-And that's pretty much it! A simple notifications script that will make using Windows Server Backup just a little bit more palatable. The full sanitized script is available [at it's dedicated repository here.](https://github.com/mrmonaghan/WindowsBackupNotifications)
+And that's pretty much it! A simple notification script that will make using Windows Server Backup just a little bit more palatable. The full sanitized script is available [at it's dedicated repository here.](https://github.com/mrmonaghan/WindowsBackupNotifications)
 
 Happy scripting!
