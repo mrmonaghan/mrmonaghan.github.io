@@ -5,7 +5,7 @@ title: Building a REST API with Powershell
 
 Recently I was tasked with building a simple REST API to serve some data from an on-premise SQL database to an Azure Logic app. At the time, the only word in that sentence I was familiar with was "simple", and since I'm a bit of a one-trick pony when it comes to scripting languages, I decided to build the solution with Powershell. After some internet sleuthing and creative trial and error, I had a working solution that would happily serve the requested data to our Logic App. 
 
-I wanted to outline the process of building the API becuase A) I haven't posted anything in quite some time and B) because there is not a wealth of information out there about how to accomplish something like this with Powershell, and I like to contribute.
+I wanted to outline the process of building the API becuase A) I haven't posted anything in quite some time and B) there is not a wealth of information out there about how to accomplish something like this with Powershell, and I like to contribute.
 
 Without further ado:
 
@@ -91,4 +91,5 @@ while($true) {
 {% endraw %}
 {% endhighlight %}
 
-Now we can simply start our listener and begin sending requests using Invoke-RestMethod.
+Now we can simply start our listener and begin sending requests and recieving response using Invoke-RestMethod.
+
